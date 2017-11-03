@@ -108,3 +108,6 @@
     record: '*.apps.{{ foreman_subdomain }}.'
     zone: '{{ foreman_subdomain }}.'
     value: 'master'
+
+- name: "HACK -- Comment out skip_orchestration to ensure DNS updates on reports"
+  command: sed -i 's|skip_orch|#skip_orch|' /usr/share/foreman/app/models/host/managed.rb
