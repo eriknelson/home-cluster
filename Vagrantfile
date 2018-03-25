@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
   domain = config_yaml.fetch("cluster_domain", "example.net")
   puts "Using cluster domain: #{domain}"
 
-  nodes = (1..(ENV["NUM_NODES"]||3).to_i).map { |i| "node#{i-1}.#{domain}"}
+  nodes = (1..(ENV["NUM_NODES"]||2).to_i).map { |i| "node#{i-1}.#{domain}"}
   verbosity = ENV["VERBOSITY"]||""
 
   config.hostmanager.enabled = true
