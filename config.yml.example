@@ -1,5 +1,7 @@
 # Overrides
 
+cluster_domain: example.net
+
 ### Foreman
 foreman_hostname: foreman
 foreman_subdomain: example.org

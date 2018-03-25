@@ -3,8 +3,14 @@
 
 
 Vagrant.configure("2") do |config|
+  pdir = File.dirname(__FILE__)
+  config_file = File.join(pdir, "config.yml")
+  config_present = File.file? config_file
+  config_yaml = YAML.load(File.read(config_file))
+  domain = config_yaml.fetch("cluster_domain", "example.net")
+  puts "Using cluster domain: #{domain}"
 
-  nodes = (1..(ENV["NUM_NODES"]||3).to_i).map { |i| "node#{i-1}.example.net"}
+  nodes = (1..(ENV["NUM_NODES"]||3).to_i).map { |i| "node#{i-1}.#{domain}"}
   verbosity = ENV["VERBOSITY"]||""
 
   config.hostmanager.enabled = true
@@ -18,16 +24,16 @@ Vagrant.configure("2") do |config|
     }
   end
 
-  config.vm.define 'master.example.net', :primary => true do |master|
+  config.vm.define "master.#{domain}", :primary => true do |master|
     master.vm.box = "dongsupark/coreos-stable"
-    master.vm.hostname = 'master.example.net'
+    master.vm.hostname = "master.#{domain}"
     master.hostmanager.manage_host = true
     master.hostmanager.manage_guest = false
     master.vm.network :private_network,
       :mac => "52:11:22:33:44:41",
       :ip => '192.168.47.11',
       :libvirt__network_name => "coreos-cluster",
-      :libvirt__domain_name => "example.net",
+      :libvirt__domain_name => domain,
       :libvirt__dhcp_enabled => true,
       :libvirt__netmask => "255.255.255.0",
       :libvirt__dhcp_bootp_file => "undionly.kpxe",
@@ -46,9 +52,12 @@ Vagrant.configure("2") do |config|
     EOF
     master.vm.provision :ansible do |ansible|
       ansible.host_vars = {
-        'matchbox.example.net' => {
+        'ansible_runner' => {
+          'matchbox_host': "master.#{domain}",
+        },
+        "matchbox.#{domain}" => {
           'matchbox_dns_interface': 'eth1',
-          'matchbox_host': 'master.example.net',
+          'matchbox_host': "master.#{domain}",
           'github_user': ENV['GITHUB_USER'],
           'github_password': ENV['GITHUB_PASSWORD']
         }
