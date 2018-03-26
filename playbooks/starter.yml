@@ -1,0 +1,17 @@
+---
+
+- import_playbook: prep_inventory.yml
+
+- hosts: starter
+  gather_facts: false
+  tasks:
+    - name: Wait for server to become available
+      local_action:
+        module: wait_for
+          host={{ inventory_hostname }}
+          port=22
+    - import_role:
+        name: centos
+    - setup:
+    - import_role:
+        name: starter

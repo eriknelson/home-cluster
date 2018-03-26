@@ -5,8 +5,8 @@
   - name: Template hosts
     copy:
       content: |
-          [matchbox]
-          {{ matchbox_host }}
+          [starter]
+          {{ starter_host }}
 
           [masters:children]
 
@@ -15,8 +15,6 @@
 
           [nodes:children]
           masters
-
-          [foreman_hostgroup_openshift_nodes]
 
           [OSEv3:children]
           masters
