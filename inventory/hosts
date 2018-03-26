@@ -3,6 +3,3 @@ localhost
 
 [ansible_runner:vars]
 ansible_connection=local
-
-[matchbox]
-master.example.net
