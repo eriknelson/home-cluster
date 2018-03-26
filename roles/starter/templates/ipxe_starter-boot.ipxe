@@ -1,0 +1,4 @@
+#!ipxe
+kernel {{ centos_kernel_url }} {{ centos_kernel_args }}
+initrd {{ centos_initrd_url }}
+boot

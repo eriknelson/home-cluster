@@ -1,0 +1,42 @@
+---
+- name: Setup www dir
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ httpd_host_dir}}/ks'
+    - '{{ httpd_host_dir}}/ipxe'
+
+- name: Copy boot templates
+  template:
+    src: '{{ item }}'
+    dest: "{{ httpd_host_dir }}/{{ item.split('/')[-1].split('_') | join('/') }}"
+  with_fileglob:
+    - 'templates/*'
+
+- name: Setup ProxyDHCP/TFTP/DNS with dnsmasq
+  docker_container:
+    name: matchbox_dns
+    image: quay.io/coreos/dnsmasq
+    capabilities:
+      - 'NET_ADMIN'
+    network_mode: host
+    command:
+      - '-d'
+      - '-q'
+      - '--dhcp-range={{ starter_subnet }},proxy,255.255.255.0'
+      - '--enable-tftp'
+      - '--tftp-root=/var/lib/tftpboot'
+      - '--dhcp-userclass=set:ipxe,iPXE'
+      - '--pxe-service=tag:#ipxe,x86PC,"PXE chainload to iPXE",undionly.kpxe'
+      - '--pxe-service=tag:ipxe,x86PC,"iPXE",http://{{ starter_ip }}:{{ starter_port }}/ipxe/starter-boot.ipxe'
+      - '--address=/{{ starter_host }}/{{ starter_ip }}'
+      - '--log-queries'
+      - '--log-dhcp'
+
+- name: Start http server
+  docker_container:
+    name: httpd
+    image: httpd:alpine
+    volumes: '{{ httpd_host_dir }}:/usr/local/apache2/htdocs/'
+    published_ports: '{{ starter_port }}:80'

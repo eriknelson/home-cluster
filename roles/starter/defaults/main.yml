@@ -1,0 +1,10 @@
+---
+# defaults file for starter
+httpd_host_dir: /srv/www
+starter_port: 8080
+ks_path: '/ks/starter.ks.cfg'
+ks_timezone: 'America/New_York'
+centos_repo: 'http://mirror.centos.org/centos/7/os/x86_64'
+centos_kernel_url: '{{ centos_repo }}/images/pxeboot/vmlinuz'
+centos_kernel_args: 'inst.ks=http://{{ starter_ip }}:{{ starter_port }}{{ ks_path }} inst.ks.sendmac'
+centos_initrd_url: '{{ centos_repo }}/images/pxeboot/initrd.img'
