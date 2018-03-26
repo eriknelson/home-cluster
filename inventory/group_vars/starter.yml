@@ -1,0 +1,8 @@
+ansible_ssh_user: root
+
+starter_host: "{{ inventory_hostname }}"
+starter_dns_interface: "{{ ansible_default_ipv4.interface }}"
+starter_network_facts: "{{ vars['ansible_' + starter_dns_interface] }}"
+starter_ip: "{{ starter_network_facts.ipv4.address }}"
+starter_subnet: "{{ starter_network_facts.ipv4.network }}"
+starter_proxy_dns_reverse: "{{ (starter_subnet | ipaddr('revdns'))[2:-1] }}"
